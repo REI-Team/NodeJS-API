@@ -4,6 +4,7 @@ const url = require("url");
 const post = require("./post.js");
 const { v4: uuidv4 } = require("uuid");
 const utils = require("./functions/gameLogic.js");
+const api=require('./functions/API.js')
 
 // Wait 'ms' milliseconds
 function wait(ms) {
@@ -21,6 +22,13 @@ const httpServer = app.listen(port, appListen);
 function appListen() {
   //console.log(`Listening for HTTP queries on: http://localhost:${port}`)
 }
+// If the script close, close the server
+process.on("SIGINT", () => {
+  console.log("Closing http server");
+  httpServer.close()
+})
+// API functions
+app.use('/API', api.router)
 
 // Run WebSocket server
 const WebSocket = require("ws");
@@ -166,9 +174,8 @@ function gameLoop() {
   // if the players are online the game starts
   // TODO broadcaste neccesary info for the game
 
-
   const endTime = Date.now();
-  const elapsedTime = endTime - startTime;
+  const elapsedTime = endTime - startTime; // TODO pass this to calculate score
   const remainingTime = Math.max(1, TARGET_MS - elapsedTime);
 
   frameCount++;
