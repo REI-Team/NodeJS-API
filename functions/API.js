@@ -30,6 +30,8 @@ async function getRanking(req,res){
         query+='LIMIT 20'
     }
     query+=';'
+    let results= await utils.queryDatabase(query)
+    result={ status: "OK", result: results }
     return res.send(result)
 }
 
