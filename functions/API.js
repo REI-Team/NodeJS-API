@@ -4,6 +4,7 @@ var router = express.Router();
 const utils= require('./utils.js')
 
 router.post('/set_record',setRecord)
+router.post('/get_ranking',getRanking)
 
 async function setRecord(req,res){
     let receivedPOST = await post.getPostObject(req)
@@ -15,6 +16,20 @@ async function setRecord(req,res){
         if(saved) result={status: "OK", result: `SCORE SAVED:${saved}`}
     }
 
+    return res.send(result)
+}
+
+async function getRanking(req,res){
+    let receivedPOST = await post.getPostObject(req)
+    let result = { status: "KO", result: "Invalid param" }
+    let query='SELECT * FROM ranking ORDER BY score '
+    if(receivedPOST.start && receivedPOST.elements ){
+        // TODO here score calculator and push on bbdd
+        query+=`LIMIT ${receivedPOST.start} OFFSET ${receivedPOST.elements}`
+    }else{
+        query+='LIMIT 20'
+    }
+    query+=';'
     return res.send(result)
 }
 
