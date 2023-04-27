@@ -35,4 +35,4 @@ async function getRanking(req,res){
     return res.send(result)
 }
 
-module.exports = { router,test }
+module.exports = { router }

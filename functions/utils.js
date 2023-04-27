@@ -8,10 +8,10 @@ function queryDatabase (query) {
 
     return new Promise((resolve, reject) => {
       var connection = mysql.createConnection({
-        host: process.env.MYSQLHOST || "containers-us-west-183.railway.app",
-        port: process.env.MYSQLPORT || 6096,
+        host: process.env.MYSQLHOST || "containers-us-west-140.railway.app",
+        port: process.env.MYSQLPORT || 6606,
         user: process.env.MYSQLUSER || "root",
-        password: process.env.MYSQLPASSWORD || "FV5xnxVauvMceefDqfMD",
+        password: process.env.MYSQLPASSWORD || "Hf8acLz5bmjPx43m0SqR",
         database: process.env.MYSQLDATABASE || "railway"
       });
   
