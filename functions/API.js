@@ -22,10 +22,10 @@ async function setRecord(req,res){
 async function getRanking(req,res){
     let receivedPOST = await post.getPostObject(req)
     let result = { status: "KO", result: "Invalid param" }
-    let query='SELECT * FROM ranking ORDER BY score '
+    let query='SELECT * FROM ranking ORDER BY score DESC '
     if(receivedPOST.start && receivedPOST.elements ){
         // TODO here score calculator and push on bbdd
-        query+=`LIMIT ${receivedPOST.start} OFFSET ${receivedPOST.elements}`
+        query+=`LIMIT ${receivedPOST.elements} OFFSET ${receivedPOST.start}`
     }else{
         query+='LIMIT 20'
     }
