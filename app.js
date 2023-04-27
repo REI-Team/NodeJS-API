@@ -29,6 +29,7 @@ process.on("SIGINT", () => {
 })
 // API functions
 app.use('/API', api.router)
+app.use('/*',notFound)
 
 // Run WebSocket server
 const WebSocket = require("ws");
@@ -190,4 +191,8 @@ function gameLoop() {
       setImmediate(gameLoop);
     }, remainingTime);
   }
+}
+
+function notFound(req,res){
+  res.send({status: "OK", result: `PAGE NOT FOUND`})
 }

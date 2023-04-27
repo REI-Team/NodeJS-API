@@ -47,6 +47,14 @@ async function saveScore(name,degree,success,errors,time){
   // if(!exists || exists.length==0) return false
   let numberOfOcupations =await queryDatabase(`SELECT COUNT(name) FROM ocupations WHERE degree=${degree};`)
   if(!numberOfOcupations || numberOfOcupations==0) return false
+  try {
+    numberOfOcupations=numberOfOcupations[0]['COUNT(name)']
+    success=parseInt(success)
+    errors=parseInt(errors)
+    time=parseInt(time)
+  } catch (error) {
+    return false
+  }
   let endScore = 0;
     endScore += (success / numberOfOcupations) * 10;
     endScore -= (errors / numberOfOcupations) * 5;
@@ -57,10 +65,11 @@ async function saveScore(name,degree,success,errors,time){
     } else {
         endScore += 1;
     }
-    endScore= Math.max(0, Math.min(endScore, 10));
+    endScore=await Math.max(0, Math.min(endScore, 10));
     try {
       await queryDatabase(`INSERT INTO ranking(name,degree,score,time,errors,success) VALUES('${name}',${degree},${endScore},${time},${errors},${success});`)
     } catch (error) {
+      console.log(error);
       return false
     }
     return endScore;
