@@ -1,0 +1,10 @@
+POST https://nodejs-api-production-a765.up.railway.app/API/set_record HTTP/1.1
+content-type: application/json
+
+{
+    "name":"Edgar",
+    "degree":2,
+    "success":2,
+    "errors":0,
+    "time":"10-05-23"
+}

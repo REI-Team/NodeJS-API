@@ -1,0 +1,7 @@
+POST https://nodejs-api-production-a765.up.railway.app/API/get_ranking HTTP/1.1
+content-type: application/json
+
+{
+    "start":2,
+    "elements":2
+}
