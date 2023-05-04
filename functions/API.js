@@ -15,7 +15,7 @@ async function setRecord(req,res){
     if(receivedPOST.name && receivedPOST.degree && receivedPOST.success && receivedPOST.errors && receivedPOST.time){
         // TODO here score calculator and push on bbdd
         // console.log("params ok");
-        let saved=await utils.saveScore(receivedPOST.name, receivedPOST.degree , receivedPOST.success , receivedPOST.errors , receivedPOST.time)
+        let saved=await utils.saveScore(receivedPOST.name, receivedPOST.degree , receivedPOST.success , receivedPOST.errors , receivedPOST.time,req.socket.remoteAddress)
         if(saved) result={status: "OK", result: `SCORE SAVED:${saved}`}
         // console.log(result,saved);
     }
@@ -40,6 +40,7 @@ async function getRanking(req,res){
 }
 
 async function getRankingDesktop(req,res){
+    // console.log(req.socket.remoteAddress);
     let receivedPOST = await post.getPostObject(req)
     let result = { status: "KO", result: "Invalid param" }
     let query='SELECT * FROM ranking ORDER BY score DESC '

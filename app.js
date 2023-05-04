@@ -4,6 +4,7 @@ const url = require("url");
 const post = require("./post.js");
 const { v4: uuidv4 } = require("uuid");
 const utils = require("./functions/gameLogic.js");
+const functions=require("./functions/utils.js")
 const api=require('./functions/API.js')
 
 // Wait 'ms' milliseconds
@@ -27,6 +28,7 @@ process.on("SIGINT", () => {
   console.log("Closing http server");
   httpServer.close()
 })
+app.set('trust proxy', true) // this to take the client ip
 // API functions
 app.use('/API', api.router)
 app.use('/*',notFound)
@@ -38,24 +40,29 @@ const socketsClients = new Map();
 console.log(`Listening for WebSocket queries on ${port}`);
 
 // What to do when a websocket client connects
-wss.on("connection", (ws) => {
+wss.on("connection", (ws,req) => {
   console.log("Client connected");
   // Add client to the clients list
   const id = uuidv4();
-  
-  // if (socketsClients.has("pl1")) {
-  //   if (socketsClients.has("pl2")) {
-  //     ws.close();
-  //   } else {
-  //     socketsClients.set("pl2", ws);
-  //     ws.send(JSON.stringify({ type: "setPlayer", player: 2 }))
-  //     //TODO start game
-  //   }
-  // } else {
-  //   socketsClients.set("pl1", ws);
-  //   ws.send(JSON.stringify({ type: "setPlayer", player: 1 }))
-  //   console.log("pl1")
-  // }
+  console.log("Number of clients: ",wss.clients.size);
+  // console.log(req.socket.remoteAddress);
+  functions.storeConn(req.socket.remoteAddress)
+  // console.log(wss.clients);
+  socketsClients.set(ws,"prueba");
+  console.log(socketsClients.get(ws));
+  if (socketsClients.has("pl1")) {
+    if (socketsClients.has("pl2")) {
+      // ws.close();
+    } else {
+      socketsClients.set("pl2", ws);
+      ws.send(JSON.stringify({ type: "setPlayer", player: 2 }))
+      //TODO start game
+    }
+  } else {
+    socketsClients.set("pl1", ws);
+    ws.send(JSON.stringify({ type: "setPlayer", player: 1 }))
+    // console.log("pl1")
+  }
   var rst = { type: "connectionTest", message: "OK" };
   ws.send(JSON.stringify(rst));
 
@@ -65,6 +72,8 @@ wss.on("connection", (ws) => {
 
   // What to do when a client is disconnected
   ws.on("close", () => {
+    // TODO here change to control tokens 
+
   });
 
   // What to do when a client message is received
@@ -94,10 +103,11 @@ wss.on("connection", (ws) => {
         message: messageAsObject.message,
       };
       private(rst);
+    } 
+    else if (messageAsObject.type == "playerDirection") {
+      // utils.updateDirection(messageAsObject.player, messageAsObject.direction) // TODO change method
     // } 
-    // else if (messageAsObject.type == "playerDirection") {
-    //   utils.updateDirection(messageAsObject.player, messageAsObject.direction)
-    // } else if (messageAsObject.type == "kickBall") {
+    // else if (messageAsObject.type == "kickBall") {
     //   console.log(messageAsObject)
     //   utils.kickBall(messageAsObject.player)
     } else if (messageAsObject.type == "disconnectPlayer") {
@@ -167,7 +177,7 @@ function gameLoop() {
         // if the players are online the game starts
         // TODO HERE LOGIC
         // utils.run(currentFPS.toFixed(2));
-        broadcast(utils.getRst());
+        // broadcast(utils.getRst());
         // TODO broadcaste neccesary info for the game
       }
     }

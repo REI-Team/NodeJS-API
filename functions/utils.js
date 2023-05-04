@@ -42,7 +42,7 @@ async function encriptPassword(passwd){
   return hash
 }
 
-async function saveScore(name,degree,success,errors,time){
+async function saveScore(name,degree,success,errors,time,ip){
   // let exists=await queryDatabase(`SELECT id FROM degree WHERE name='${degree}';`) // <- THIS IS OPTIONAL , BETTER WE PASS THE ID AND NOT THE NAME
   // if(!exists || exists.length==0) return false
   let numberOfOcupations =await queryDatabase(`SELECT COUNT(name) FROM ocupations WHERE degree=${degree};`)
@@ -67,7 +67,7 @@ async function saveScore(name,degree,success,errors,time){
     }
     endScore=await Math.max(0, Math.min(endScore, 10));
     try {
-      await queryDatabase(`INSERT INTO ranking(name,degree,score,time,errors,success) VALUES('${name}',${degree},${endScore},${time},${errors},${success});`)
+      await queryDatabase(`INSERT INTO ranking(name,degree,score,time,errors,success,ip) VALUES('${name}',${degree},${endScore},${time},${errors},${success},${ip});`)
     } catch (error) {
       console.log(error);
       return false
@@ -75,4 +75,13 @@ async function saveScore(name,degree,success,errors,time){
     return endScore;
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore }
+async function storeConn(ip){
+  try {
+    await queryDatabase(`INSERT INTO connections(ip,time) VALUES('${ip}','${new Date()}');`)
+  } catch (error) {
+    console.log("ERROR#storeConn");
+    console.log(error);
+  }
+}
+
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn }
