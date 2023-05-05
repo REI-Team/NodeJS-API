@@ -3,6 +3,7 @@ const mysql=require('mysql2')
 var express = require('express');
 var bcrypt = require("bcryptjs");
 
+var tokens={}
 // Perform a query to the database
 function queryDatabase (query) {
 
@@ -75,4 +76,46 @@ async function saveScore(name,degree,success,errors,time){
     return endScore;
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore }
+async function makeTokens(req,res){ // <- Working function, transform to ws type and variable use
+  let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${1};`)
+  if(ocupations.length>4){
+    let choosed=[]
+    let actualnum=0
+    let tokensArray=[]
+    for (let index = 0; index < 5; index++) {
+
+      while (actualnum==0||choosed.includes(actualnum)) {
+        actualnum=getRandomInt(ocupations.length)
+      }
+      choosed.push(actualnum)
+      tokensArray.push(ocupations[actualnum])
+    }
+
+    let traps=await queryDatabase(`SELECT * FROM ocupations WHERE degree<>${1};`)
+    if(traps.length>4){
+      let choosed=[]
+      let actualnum=0
+      let trapsArray=[]
+      for (let index = 0; index < 5; index++) {
+
+        while (actualnum==0||choosed.includes(actualnum)) {
+          actualnum=getRandomInt(traps.length)
+        }
+        choosed.push(actualnum)
+        trapsArray.push(traps[actualnum])
+      }
+
+      // TODO make this :
+      // tokens[id/or/IP]={tokens:tokensArray,traps:trapsArray}
+
+    return res.send({r:"OK",m:tokensArray,e:trapsArray}) // remove this later
+  }
+}
+  return res.send({r:"no"}) // remove this later
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max)+1;
+}
+
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,makeTokens,tokens }

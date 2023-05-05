@@ -43,19 +43,7 @@ wss.on("connection", (ws) => {
   // Add client to the clients list
   const id = uuidv4();
   
-  // if (socketsClients.has("pl1")) {
-  //   if (socketsClients.has("pl2")) {
-  //     ws.close();
-  //   } else {
-  //     socketsClients.set("pl2", ws);
-  //     ws.send(JSON.stringify({ type: "setPlayer", player: 2 }))
-  //     //TODO start game
-  //   }
-  // } else {
-  //   socketsClients.set("pl1", ws);
-  //   ws.send(JSON.stringify({ type: "setPlayer", player: 1 }))
-  //   console.log("pl1")
-  // }
+  
   var rst = { type: "connectionTest", message: "OK" };
   ws.send(JSON.stringify(rst));
 
@@ -106,6 +94,8 @@ wss.on("connection", (ws) => {
       socketsClients.delete("pl2")
       broadcast({ type: "disconnect" })
     }
+
+    console.log(messageAsObject)
   });
 });
 
