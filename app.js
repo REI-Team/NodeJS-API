@@ -116,6 +116,8 @@ wss.on("connection", (ws,req) => {
       socketsClients.delete("pl2")
       broadcast({ type: "disconnect" })
     }
+
+    console.log(messageAsObject)
   });
 });
 
