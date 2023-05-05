@@ -6,12 +6,9 @@ const functions=require('./utils')
 
 router.post('/set_record',setRecord)
 router.post('/get_ranking',getRanking)
-<<<<<<< HEAD
 router.post('/get_ranking_desk',getRankingDesktop)
 router.post('/set_visibility',setVisibility)
-=======
 router.get('/test',functions.makeTokens)
->>>>>>> main
 
 async function setRecord(req,res){
     let receivedPOST = await post.getPostObject(req)

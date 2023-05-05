@@ -76,7 +76,6 @@ async function saveScore(name,degree,success,errors,time,ip){
     return endScore;
 }
 
-<<<<<<< HEAD
 async function storeConn(ip){
   try {
     await queryDatabase(`INSERT INTO connections(ip,time) VALUES('${ip}','${new Date()}');`)
@@ -87,7 +86,6 @@ async function storeConn(ip){
 }
 
 module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn }
-=======
 async function makeTokens(req,res){ // <- Working function, transform to ws type and variable use
   let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${1};`)
   if(ocupations.length>4){
@@ -131,4 +129,3 @@ function getRandomInt(max) {
 }
 
 module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,makeTokens,tokens }
->>>>>>> main
