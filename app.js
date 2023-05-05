@@ -36,7 +36,8 @@ app.use('/*',notFound)
 // Run WebSocket server
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ server: httpServer });
-const socketsClients = new Map();
+const socketsClients = new Map(); // variable to localize players , asign and delete from players list
+let players={};
 console.log(`Listening for WebSocket queries on ${port}`);
 
 // What to do when a websocket client connects
@@ -48,36 +49,30 @@ wss.on("connection", (ws,req) => {
   // console.log(req.socket.remoteAddress);
   functions.storeConn(req.socket.remoteAddress)
   // console.log(wss.clients);
-  socketsClients.set(ws,"prueba");
-  console.log(socketsClients.get(ws));
-  if (socketsClients.has("pl1")) {
-    if (socketsClients.has("pl2")) {
-      // ws.close();
-    } else {
-      socketsClients.set("pl2", ws);
-      ws.send(JSON.stringify({ type: "setPlayer", player: 2 }))
-      //TODO start game
-    }
-  } else {
-    socketsClients.set("pl1", ws);
-    ws.send(JSON.stringify({ type: "setPlayer", player: 1 }))
-    // console.log("pl1")
-  }
-  var rst = { type: "connectionTest", message: "OK" };
+  players[id]={tokens:[],traps:[],start:0,end:0,hits:0,error:0}
+  socketsClients.set(ws,id);
+  var rst = { type: "connectionTest", message: "OK" ,player:id};
   ws.send(JSON.stringify(rst));
 
-  gameLoop();
+  // gameLoop();
   // Send clients list to everyone
   // sendClients()
 
   // What to do when a client is disconnected
   ws.on("close", () => {
     // TODO here change to control tokens 
-
+    delete players[socketsClients.get(ws)];
+    delete functions.tokens[socketsClients.get(ws)]
+    socketsClients.delete(ws)
+    if(wss.clients.size<=1){
+      functions.tokens={};
+      console.log("TOKENS WIPED");
+      // TODO stop logic here
+    }
   });
 
   // What to do when a client message is received
-  ws.on("message", (bufferedMessage) => {
+  ws.on("message", async (bufferedMessage) => { // TODO configure calls
     var messageAsString = bufferedMessage.toString();
     var messageAsObject = {};
     try {
@@ -85,17 +80,32 @@ wss.on("connection", (ws,req) => {
     } catch (e) {
       console.log("Could not parse bufferedMessage from WS message");
     }
-    if (messageAsObject.type == "bounce") {
-      var rst = { type: "bounce", message: messageAsObject.message };
-      ws.send(JSON.stringify(rst));
-    } else if (messageAsObject.type == "broadcast") {
+    if (messageAsObject.type == "setPlayer" && messageAsObject.id && messageAsObject.grade && messageAsObject.username) {
+      // TODO HERE
+      let ok=await functions.makeTokens(messageAsObject.id , messageAsObject.username , messageAsObject.grade)
+      if(ok){
+        players[messageAsObject.id].tokens=functions.tokens[messageAsObject.id].tokens
+        players[messageAsObject.id].traps=functions.tokens[messageAsObject.id].traps
+        if(ws.clients.size>1){
+        
+          var rst = { type: "totems", message: functions.tokens };
+          ws.broadcast(JSON.stringify(rst));
+        }
+
+      }else{
+        var rst = { type: "error", message: "Token generate error" };
+          ws.send(JSON.stringify(rst));
+      }
+
+
+    } else if (messageAsObject.type == "broadcast") { // CAN BE USEFULL TO BROADCAST WHEN A PLAYER CONNECT OR WINS
       var rst = {
         type: "broadcast",
         origin: id,
         message: messageAsObject.message,
       };
       broadcast(rst);
-    } else if (messageAsObject.type == "private") {
+    } else if (messageAsObject.type == "private") { // Maybe not neccessary
       var rst = {
         type: "private",
         origin: id,
@@ -104,16 +114,16 @@ wss.on("connection", (ws,req) => {
       };
       private(rst);
     } 
-    else if (messageAsObject.type == "playerDirection") {
+    else if (messageAsObject.type == "playerDirection") { // TODO
       // utils.updateDirection(messageAsObject.player, messageAsObject.direction) // TODO change method
     // } 
     // else if (messageAsObject.type == "kickBall") {
     //   console.log(messageAsObject)
     //   utils.kickBall(messageAsObject.player)
     } else if (messageAsObject.type == "disconnectPlayer") {
-      utils.reset()
-      socketsClients.delete("pl1")
-      socketsClients.delete("pl2")
+      // utils.reset()
+      // socketsClients.delete("pl1")
+      // socketsClients.delete("pl2")
       broadcast({ type: "disconnect" })
     }
 

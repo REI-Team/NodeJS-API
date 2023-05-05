@@ -3,7 +3,7 @@ const mysql=require('mysql2')
 var express = require('express');
 var bcrypt = require("bcryptjs");
 
-var tokens={}
+var tokens={} // variable for broadcast totems to all clients
 // Perform a query to the database
 function queryDatabase (query) {
 
@@ -85,9 +85,8 @@ async function storeConn(ip){
   }
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn }
-async function makeTokens(req,res){ // <- Working function, transform to ws type and variable use
-  let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${1};`)
+async function makeTokens(id,name,degree){ 
+  let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${degree};`)
   if(ocupations.length>4){
     let choosed=[]
     let actualnum=0
@@ -101,7 +100,7 @@ async function makeTokens(req,res){ // <- Working function, transform to ws type
       tokensArray.push(ocupations[actualnum])
     }
 
-    let traps=await queryDatabase(`SELECT * FROM ocupations WHERE degree<>${1};`)
+    let traps=await queryDatabase(`SELECT * FROM ocupations WHERE degree<>${degree};`)
     if(traps.length>4){
       let choosed=[]
       let actualnum=0
@@ -114,18 +113,16 @@ async function makeTokens(req,res){ // <- Working function, transform to ws type
         choosed.push(actualnum)
         trapsArray.push(traps[actualnum])
       }
-
-      // TODO make this :
-      // tokens[id/or/IP]={tokens:tokensArray,traps:trapsArray}
-
-    return res.send({r:"OK",m:tokensArray,e:trapsArray}) // remove this later
+      tokens[id]={tokens:tokensArray,traps:trapsArray}
+      return true
   }
 }
-  return res.send({r:"no"}) // remove this later
+
+  return false
 }
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max)+1;
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,makeTokens,tokens }
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,tokens }
