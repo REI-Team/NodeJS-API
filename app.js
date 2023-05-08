@@ -87,11 +87,9 @@ wss.on("connection", (ws,req) => {
       if(ok){
         players[messageAsObject.id].tokens=functions.tokens[messageAsObject.id].tokens
         players[messageAsObject.id].traps=functions.tokens[messageAsObject.id].traps
-        if(ws.clients.size>1){
         
-          var rst = { type: "totems", message: functions.tokens };
-          ws.broadcast(JSON.stringify(rst));
-        }
+        var rst = { type: "totems", message: functions.tokens };
+        ws.broadcast(JSON.stringify(rst));
 
       }else{
         var rst = { type: "error", message: "Token generate error" };

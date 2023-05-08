@@ -114,6 +114,7 @@ async function makeTokens(id,name,degree){
         trapsArray.push(traps[actualnum])
       }
       tokens[id]={tokens:tokensArray,traps:trapsArray}
+      console.log("ACTUAL TOKENS:",tokens);
       return true
   }
 }
