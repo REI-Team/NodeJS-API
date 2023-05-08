@@ -84,12 +84,13 @@ wss.on("connection", (ws,req) => {
     if (messageAsObject.type == "setPlayer" && messageAsObject.id && messageAsObject.grade && messageAsObject.username) {
       // TODO HERE
       let ok=await functions.makeTokens(messageAsObject.id , messageAsObject.username , messageAsObject.grade)
+      console.log(ok);
       if(ok){
-        players[messageAsObject.id].tokens=functions.tokens[messageAsObject.id].tokens
-        players[messageAsObject.id].traps=functions.tokens[messageAsObject.id].traps
+        players[messageAsObject.id].tokens=ok[messageAsObject.id].tokens
+        players[messageAsObject.id].traps=ok[messageAsObject.id].traps
         
-        var rst = { type: "totems", message: functions.tokens };
-        ws.broadcast(JSON.stringify(rst));
+        var rst = {type:"totems",message:ok};
+        broadcast(rst);
 
       }else{
         var rst = { type: "error", message: "Token generate error" };

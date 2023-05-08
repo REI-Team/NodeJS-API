@@ -3,6 +3,7 @@ const mysql=require('mysql2')
 var express = require('express');
 var bcrypt = require("bcryptjs");
 
+var positions=[]
 var tokens={} // variable for broadcast totems to all clients
 // Perform a query to the database
 function queryDatabase (query) {
@@ -68,7 +69,7 @@ async function saveScore(name,degree,success,errors,time,ip){
     }
     endScore=await Math.max(0, Math.min(endScore, 10));
     try {
-      await queryDatabase(`INSERT INTO ranking(name,degree,score,time,errors,success,ip) VALUES('${name}',${degree},${endScore},${time},${errors},${success},${ip});`)
+      await queryDatabase(`INSERT INTO ranking(name,degree,score,time,errors,success,ip) VALUES('${name}',${degree},${endScore},${time},${errors},${success},'${ip}');`)
     } catch (error) {
       console.log(error);
       return false
@@ -97,7 +98,7 @@ async function makeTokens(id,name,degree){
         actualnum=getRandomInt(ocupations.length)
       }
       choosed.push(actualnum)
-      tokensArray.push(ocupations[actualnum])
+      tokensArray.push({totem:ocupations[actualnum],position:registerObject()})
     }
 
     let traps=await queryDatabase(`SELECT * FROM ocupations WHERE degree<>${degree};`)
@@ -111,11 +112,12 @@ async function makeTokens(id,name,degree){
           actualnum=getRandomInt(traps.length)
         }
         choosed.push(actualnum)
-        trapsArray.push(traps[actualnum])
+        trapsArray.push({totem:traps[actualnum],position:registerObject()})
       }
-      tokens[id]={tokens:tokensArray,traps:trapsArray}
+      tokens[id]={totems:tokensArray,traps:trapsArray}
       console.log("ACTUAL TOKENS:",tokens);
-      return true
+      // wait(1000);
+      return tokens
   }
 }
 
@@ -125,5 +127,52 @@ async function makeTokens(id,name,degree){
 function getRandomInt(max) {
   return Math.floor(Math.random() * max)+1;
 }
+
+// Generate totems position
+// Initialize an empty grid to keep track of registered object positions
+let y=Math.floor(1440 / 60)
+let x=Math.floor(2560 / 50)
+const grid = new Array(x)
+  .fill()
+  .map(() => new Array(y).fill(false));
+
+function registerObject() {
+  const cellWidth = 50;
+  const cellHeight = 60;
+  const mapWidth = 2560;
+  const mapHeight = 1440;
+
+  // Generate a random x and y position for the new object
+  let x, y;
+  do {
+    x = Math.floor(Math.random() * (mapWidth - cellWidth));
+    y = Math.floor(Math.random() * (mapHeight - cellHeight));
+  } while (checkOverlap(x, y));
+
+  // Register the object's position on the grid
+  const gridX = Math.floor(x / cellWidth);
+  const gridY = Math.floor(y / cellHeight);
+  grid[gridX][gridY] = true;
+
+  // Return the object's position
+  return { x, y };
+}
+
+// Helper function to check for overlap with existing objects
+function checkOverlap(x, y) {
+  const cellWidth = 50;
+  const cellHeight = 60;
+
+  // Check if the new object overlaps with any previously registered objects
+  for (let i = Math.floor(x / cellWidth); i <= Math.ceil((x + cellWidth) / cellWidth) - 1; i++) {
+    for (let j = Math.floor(y / cellHeight); j <= Math.ceil((y + cellHeight) / cellHeight) - 1; j++) {
+      if (grid[i][j]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,tokens }
