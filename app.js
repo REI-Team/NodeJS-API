@@ -65,7 +65,7 @@ wss.on("connection", (ws,req) => {
     delete functions.tokens[socketsClients.get(ws)]
     socketsClients.delete(ws)
     functions.storeConn(req.socket.remoteAddress,"Disconnect")
-    if(wss.clients.size<=1){
+    if(wss.clients.size<1){
       functions.tokens={};
       console.log("TOKENS WIPED");
       // TODO stop logic here
