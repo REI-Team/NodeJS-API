@@ -76,9 +76,9 @@ async function saveScore(name,degree,success,errors,time,ip){
     return endScore;
 }
 
-async function storeConn(ip){
+async function storeConn(ip,type){
   try {
-    await queryDatabase(`INSERT INTO connections(ip,time) VALUES('${ip}','${new Date()}');`)
+    await queryDatabase(`INSERT INTO connections(ip,time,type) VALUES('${ip}','${new Date()}','${type}');`)
   } catch (error) {
     console.log("ERROR#storeConn");
     console.log(error);

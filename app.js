@@ -47,7 +47,7 @@ wss.on("connection", (ws,req) => {
   const id = uuidv4();
   console.log("Number of clients: ",wss.clients.size);
   // console.log(req.socket.remoteAddress);
-  functions.storeConn(req.socket.remoteAddress)
+  functions.storeConn(req.socket.remoteAddress,"Connection")
   // console.log(wss.clients);
   players[id]={tokens:[],traps:[],start:0,end:0,hits:0,error:0}
   socketsClients.set(ws,id);
@@ -64,6 +64,7 @@ wss.on("connection", (ws,req) => {
     delete players[socketsClients.get(ws)];
     delete functions.tokens[socketsClients.get(ws)]
     socketsClients.delete(ws)
+    functions.storeConn(req.socket.remoteAddress,"Disconnect")
     if(wss.clients.size<=1){
       functions.tokens={};
       console.log("TOKENS WIPED");
