@@ -52,6 +52,7 @@ wss.on("connection", (ws,req) => {
   players[id]={tokens:[],traps:[],start:0,end:0,hits:0,error:0}
   socketsClients.set(ws,id);
   var rst = { type: "connectionTest", message: "OK" ,player:id};
+
   ws.send(JSON.stringify(rst));
 
   // gameLoop();
@@ -126,8 +127,6 @@ wss.on("connection", (ws,req) => {
       // socketsClients.delete("pl2")
       broadcast({ type: "disconnect" })
     }
-
-    console.log(messageAsObject)
   });
 });
 

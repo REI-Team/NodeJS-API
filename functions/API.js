@@ -2,13 +2,13 @@ const post = require('../post.js')
 var express = require('express');
 var router = express.Router();
 const utils= require('./utils.js')
-const functions=require('./utils')
 
 router.post('/set_record',setRecord)
 router.post('/get_ranking',getRanking)
 router.post('/get_ranking_desk',getRankingDesktop)
 router.post('/set_visibility',setVisibility)
 router.get('/test',functions.makeTokens)
+
 
 async function setRecord(req,res){
     let receivedPOST = await post.getPostObject(req)

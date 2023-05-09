@@ -5,6 +5,7 @@ var bcrypt = require("bcryptjs");
 
 var positions=[]
 var tokens={} // variable for broadcast totems to all clients
+
 // Perform a query to the database
 function queryDatabase (query) {
 
