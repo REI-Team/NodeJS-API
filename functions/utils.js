@@ -177,15 +177,16 @@ function checkOverlap(x, y) {
 
 // Totem remove function
 function removeTotem(playerId,totemId,degree){
+  console.log(playerId,totemId,degree);
+  let success=false;
   if(tokens[playerId]){
-    let success=false;
     // console.log("pre totems",tokens);
     
     tokens[playerId].totems.forEach(element => {
-      console.log(element);
-      console.log(element.totem,totemId);
-      if(element.id==totemId){
-        if(element.totem.degree==degree){
+      // console.log(element);
+      // console.log(element.totem,totemId);
+      if(element.totem.id==totemId){
+        if(element.totem.degree==degree.toString()){
           console.log("found",element);
           console.log("-------------------------")
           success=true
@@ -201,10 +202,9 @@ function removeTotem(playerId,totemId,degree){
       }
     tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
     // console.log(tokens[playerId].totems);
-    console.log("succes?",success);
-      return success
-    });
-    
+  });
+  console.log("succes?",success);
+  return success
   }
   return false;
 }

@@ -88,6 +88,7 @@ wss.on("connection", (ws,req) => {
       if(ok){
         players[socketsClients.get(ws)].username=messageAsObject.username
         players[socketsClients.get(ws)].degree=degre
+        players[socketsClients.get(ws)].start=Date.now();
         var rst = {type:"totems",message:ok};
         broadcast(rst);
 
@@ -99,7 +100,7 @@ wss.on("connection", (ws,req) => {
 
     }else if (messageAsObject.type == "removeTotem") { 
       if(messageAsObject.id && messageAsObject.totemId){
-        let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId);
+        let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId,players[socketsClients.get(ws)].degree);
         if(correct){
           players[socketsClients.get(ws)].hits++
         }else{
@@ -111,7 +112,8 @@ wss.on("connection", (ws,req) => {
           rst = {
             type: "totems",
             message: totms,
-            winner:socketsClients.get(ws)
+            winner:socketsClients.get(ws),
+            player:players[socketsClients.get(ws)]
           };
         }else{
 
