@@ -49,7 +49,7 @@ wss.on("connection", (ws,req) => {
   // console.log(req.socket.remoteAddress);
   functions.storeConn(req.socket.remoteAddress,"Connection")
   // console.log(wss.clients);
-  players[id]={tokens:[],traps:[],start:0,end:0,hits:0,error:0}
+  players[id]={start:0,end:0,hits:0,error:0,username:"",degree:0}
   socketsClients.set(ws,id);
   var rst = { type: "connectionTest", message: "OK" ,player:id};
   ws.send(JSON.stringify(rst));
@@ -81,14 +81,13 @@ wss.on("connection", (ws,req) => {
     } catch (e) {
       console.log("Could not parse bufferedMessage from WS message");
     }
-    if (messageAsObject.type == "setPlayer" && messageAsObject.id && messageAsObject.grade && messageAsObject.username) {
-      // TODO HERE
-      let ok=await functions.makeTokens(messageAsObject.id , messageAsObject.username , messageAsObject.grade)
-      console.log(ok);
+    if (messageAsObject.type == "setPlayer" && messageAsObject.grade && messageAsObject.username) {
+      let degre=await functions.getDegree(messageAsObject.grade)
+      let ok=await functions.makeTokens(socketsClients.get(ws) , degre)
+      // console.log(ok);
       if(ok){
-        players[messageAsObject.id].tokens=ok[messageAsObject.id].tokens
-        players[messageAsObject.id].traps=ok[messageAsObject.id].traps
-        
+        players[socketsClients.get(ws)].username=messageAsObject.username
+        players[socketsClients.get(ws)].degree=degre
         var rst = {type:"totems",message:ok};
         broadcast(rst);
 
@@ -97,6 +96,33 @@ wss.on("connection", (ws,req) => {
           ws.send(JSON.stringify(rst));
       }
 
+
+    }else if (messageAsObject.type == "removeTotem") { 
+      if(messageAsObject.id && messageAsObject.totemId){
+        let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId);
+        if(correct){
+          players[socketsClients.get(ws)].hits++
+        }else{
+          players[socketsClients.get(ws)].error++
+        }
+        let totms=functions.getTotems()
+        var rst
+        if(players[socketsClients.get(ws)].hits>=5){
+          rst = {
+            type: "totems",
+            message: totms,
+            winner:socketsClients.get(ws)
+          };
+        }else{
+
+          rst = {
+            type: "totems",
+            message: totms,
+            player:players[socketsClients.get(ws)]
+          };
+        }
+        broadcast(rst);
+      }
 
     } else if (messageAsObject.type == "broadcast") { // CAN BE USEFULL TO BROADCAST WHEN A PLAYER CONNECT OR WINS
       var rst = {

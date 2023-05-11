@@ -86,7 +86,7 @@ async function storeConn(ip,type){
   }
 }
 
-async function makeTokens(id,name,degree){ 
+async function makeTokens(id,degree){ 
   let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${degree};`)
   if(ocupations.length>4){
     let choosed=[]
@@ -95,9 +95,10 @@ async function makeTokens(id,name,degree){
     for (let index = 0; index < 5; index++) {
 
       while (actualnum==0||choosed.includes(actualnum)) {
-        actualnum=getRandomInt(ocupations.length)
+        actualnum=getRandomInt(ocupations.length-1)
       }
       choosed.push(actualnum)
+      // console.log("pushing",ocupations[actualnum],actualnum);
       tokensArray.push({totem:ocupations[actualnum],position:registerObject()})
     }
 
@@ -115,7 +116,7 @@ async function makeTokens(id,name,degree){
         trapsArray.push({totem:traps[actualnum],position:registerObject()})
       }
       tokens[id]={totems:tokensArray,traps:trapsArray}
-      console.log("ACTUAL TOKENS:",tokens);
+      // console.log("ACTUAL TOKENS:",tokens[id].totems);
       // wait(1000);
       return tokens
   }
@@ -174,5 +175,48 @@ function checkOverlap(x, y) {
   return false;
 }
 
+// Totem remove function
+function removeTotem(playerId,totemId,degree){
+  if(tokens[playerId]){
+    let success=false;
+    // console.log("pre totems",tokens);
+    
+    tokens[playerId].totems.forEach(element => {
+      console.log(element);
+      console.log(element.totem,totemId);
+      if(element.id==totemId){
+        if(element.totem.degree==degree){
+          console.log("found",element);
+          console.log("-------------------------")
+          success=true
+        }
+      }
+    });
+    tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id !== totemId)
+    tokens[playerId].traps.forEach(element => {
+      if(element.totem.id==totemId){
+        if(element.totem.degree==degree.toString()){
+          success=false
+        }
+      }
+    tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
+    // console.log(tokens[playerId].totems);
+    console.log("succes?",success);
+      return success
+    });
+    
+  }
+  return false;
+}
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,tokens }
+function getTotems(){
+  return tokens
+}
+
+async function getDegree(degreeName){
+  let result=await queryDatabase(`SELECT id FROM degree WHERE name='${degreeName}';`)
+  console.log(result[0].id);
+  return result[0].id;
+}
+
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,getTotems,getDegree,tokens }
