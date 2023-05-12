@@ -27,6 +27,7 @@ function appListen() {
 process.on("SIGINT", () => {
   console.log("Closing http server");
   httpServer.close()
+  clearInterval(intervalo);
 })
 app.set('trust proxy', true) // this to take the client ip
 // API functions
@@ -35,6 +36,7 @@ app.use('/*',notFound)
 
 // Run WebSocket server
 const WebSocket = require("ws");
+const { clearInterval } = require("timers");
 const wss = new WebSocket.Server({ server: httpServer });
 const socketsClients = new Map(); // variable to localize players , asign and delete from players list
 let players={};
@@ -61,12 +63,14 @@ wss.on("connection", (ws,req) => {
   // What to do when a client is disconnected
   ws.on("close", () => {
     // TODO here change to control tokens 
+    functions.delPosition(socketsClients.get(ws))
     delete players[socketsClients.get(ws)];
     delete functions.tokens[socketsClients.get(ws)]
     socketsClients.delete(ws)
     functions.storeConn(req.socket.remoteAddress,"Disconnect")
     if(wss.clients.size<1){
       functions.tokens={};
+      functions.positions={};
       console.log("TOKENS WIPED");
       // TODO stop logic here
     }
@@ -142,12 +146,10 @@ wss.on("connection", (ws,req) => {
       };
       private(rst);
     } 
-    else if (messageAsObject.type == "playerDirection") { // TODO
-      // utils.updateDirection(messageAsObject.player, messageAsObject.direction) // TODO change method
-    // } 
-    // else if (messageAsObject.type == "kickBall") {
-    //   console.log(messageAsObject)
-    //   utils.kickBall(messageAsObject.player)
+    else if (messageAsObject.type == "playerPosition") { // TODO
+      if(messageAsObject.y && messageAsObject.x){
+        functions.setPosition(socketsClients.get(ws),messageAsObject.x,messageAsObject.y)
+      }
     } else if (messageAsObject.type == "disconnectPlayer") {
       // utils.reset()
       // socketsClients.delete("pl1")
@@ -173,6 +175,22 @@ wss.on("connection", (ws,req) => {
 //     }
 //   })
 // }
+
+// Send position of all players every 200 ms
+const intervalo=setInterval(function() {
+  if(wss.clients.size>1){
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        var rst = {
+          type: "positions",
+          message: functions.getPlayerPos(socketsClients.get(client))
+        };
+        client.send(rst)
+      }
+    });
+
+  }
+}, 200);
 
 // Send a message to all websocket clients
 async function broadcast(obj) {

@@ -219,4 +219,23 @@ async function getDegree(degreeName){
   return result[0].id;
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,getTotems,getDegree,tokens }
+function getPlayerPos(excluded){
+  let result=positions
+  delete result[excluded]
+  return result
+}
+
+function setPosition(player,x,y){
+  if(positions[player]){
+    positions[player].x=x
+    positions[player].y=y
+  }else{
+    positions[player]={x:x,y:y}
+  }
+}
+
+function delPosition(player){
+  delete positions[player]
+}
+
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,delPosition,setPosition,getTotems,getDegree,getPlayerPos,tokens,positions }
