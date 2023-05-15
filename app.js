@@ -71,6 +71,9 @@ wss.on("connection", (ws,req) => {
       functions.tokens={};
       functions.positions={};
       console.log("TOKENS WIPED");
+      console.log(functions.getTotems);
+      console.log(players);
+      console.log(socketsClients);
       // TODO stop logic here
     }
   });
