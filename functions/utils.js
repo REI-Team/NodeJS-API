@@ -193,6 +193,7 @@ function removeTotem(playerId,totemId,degree,player){
   let same=false
   if(tokens[playerId]){
     // console.log("pre totems",tokens);
+    let tempTotems=[]
     
     tokens[playerId].totems.forEach(element => {
       // console.log(element);
@@ -204,42 +205,45 @@ function removeTotem(playerId,totemId,degree,player){
           if(playerId!=player){
             // element.position=registerObject()
             console.log("moving:",element.position);
-            console.log(tokens[playerId].totems[element]);
-            tokens[playerId].totems[element].position=registerObject()
-            console.log("moved:",tokens[playerId].totems[element].position);
+            // console.log(tokens[playerId].totems[element]);
+            element.position=registerObject()
+            console.log("moved:",);
           }else{
             same=true
           }
           success=true
         }
       }
+      tempTotems.push(element)
     });
+    tokens[playerId].totems=tempTotems
     if(same){
       console.log("removing",tokens[playerId].totems);
       tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id.toString() !== totemId.toString())
       console.log("removed",tokens[playerId].totems);
     }
     same=false;
+    tempTotems=[]
     tokens[playerId].traps.forEach(element => {
       if(element.totem.id==totemId){
           if(playerId!=player){
-            console.log("moving:",element.position);
-            console.log(tokens[playerId].traps[element]);
-            tokens[playerId].traps[element].position=registerObject()
-            console.log("moved:",tokens[playerId].traps[element].position);
+            element.position=registerObject()
           }else{
             same=true
           }
           success=false
+
       }
-      if(same){
-        console.log("removing",tokens[playerId].traps);
-        tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id.toString() !== totemId.toString())
-        console.log("removed",tokens[playerId].traps);
-      }
-    // console.log(tokens[playerId].totems);
-  });
-  // console.log("succes?",success);
+      // console.log(tokens[playerId].totems);
+      tempTotems.push(element)
+    });
+    tokens[playerId].traps=tempTotems
+    // console.log("succes?",success);
+    if(same){
+      console.log("removing",tokens[playerId].traps);
+      tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id.toString() !== totemId.toString())
+      console.log("removed",tokens[playerId].traps);
+    }
   return success
   }
   return false;
