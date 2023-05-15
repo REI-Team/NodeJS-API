@@ -150,8 +150,7 @@ function registerObject() {
   do {
     x = Math.floor(Math.random() * (mapWidth - cellWidth));
     y = Math.floor(Math.random() * (mapHeight - cellHeight));
-    y-=360
-    x-=644
+    
   } while (checkOverlap(x, y));
 
   // Register the object's position on the grid
@@ -159,7 +158,8 @@ function registerObject() {
   const gridY = Math.floor(y / cellHeight);
   grid[gridX][gridY] = true;
 
-  
+  y-=360
+  x-=644
   // Return the object's position
   return { x, y };
 }
