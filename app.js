@@ -135,11 +135,16 @@ wss.on("connection", (ws,req) => {
 
           rst = {
             type: "totems",
-            message: totms,
-            player:players[socketsClients.get(ws)]
+            message: totms
           };
         }
         broadcast(rst);
+        rst={
+          type:"stats",
+          hits:players[socketsClients.get(ws)].hits,
+          errors:players[socketsClients.get(ws)].error
+        }
+        ws.send(JSON.stringify(rst))
       }
 
     } else if (messageAsObject.type == "broadcast") { // CAN BE USEFULL TO BROADCAST WHEN A PLAYER CONNECT OR WINS
