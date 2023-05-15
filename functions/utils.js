@@ -260,11 +260,11 @@ async function getDegree(degreeName){
 }
 
 function getPlayerPos(excluded){
-  let result=Object.assign({}, positions);
+  // let result=Object.assign({}, positions);
+  // // console.log(result);
+  // delete result[excluded]
   // console.log(result);
-  delete result[excluded]
-  // console.log(result);
-  return result
+  return positions
 }
 
 function setPosition(player,x,y){
