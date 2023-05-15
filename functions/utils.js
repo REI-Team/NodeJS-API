@@ -131,9 +131,9 @@ function getRandomInt(max) {
 
 // Generate totems position
 // Initialize an empty grid to keep track of registered object positions
-// let y=Math.floor(1416 / 60)
-// // y-=360
-// let x=Math.floor(2516 / 50)
+let y=Math.floor(1416 / 60)
+// y-=360
+let x=Math.floor(2516 / 50)
 // x-=644
 const grid = new Array(x)
   .fill()
