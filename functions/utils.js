@@ -131,8 +131,10 @@ function getRandomInt(max) {
 
 // Generate totems position
 // Initialize an empty grid to keep track of registered object positions
-let y=Math.floor(1440 / 60)
-let x=Math.floor(2560 / 50)
+// let y=Math.floor(1416 / 60)
+// // y-=360
+// let x=Math.floor(2516 / 50)
+// x-=644
 const grid = new Array(x)
   .fill()
   .map(() => new Array(y).fill(false));
@@ -140,14 +142,16 @@ const grid = new Array(x)
 function registerObject() {
   const cellWidth = 50;
   const cellHeight = 60;
-  const mapWidth = 2560;
-  const mapHeight = 1440;
+  const mapWidth = 2516;
+  const mapHeight = 1416;
 
   // Generate a random x and y position for the new object
   let x, y;
   do {
     x = Math.floor(Math.random() * (mapWidth - cellWidth));
     y = Math.floor(Math.random() * (mapHeight - cellHeight));
+    y-=360
+    x-=644
   } while (checkOverlap(x, y));
 
   // Register the object's position on the grid
@@ -155,6 +159,7 @@ function registerObject() {
   const gridY = Math.floor(y / cellHeight);
   grid[gridX][gridY] = true;
 
+  
   // Return the object's position
   return { x, y };
 }
@@ -187,8 +192,8 @@ function removeTotem(playerId,totemId,degree){
       // console.log(element.totem,totemId);
       if(element.totem.id==totemId){
         if(element.totem.degree==degree.toString()){
-          console.log("found",element);
-          console.log("-------------------------")
+          // console.log("found",element);
+          // console.log("-------------------------")
           success=true
         }
       }
@@ -203,7 +208,7 @@ function removeTotem(playerId,totemId,degree){
     tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
     // console.log(tokens[playerId].totems);
   });
-  console.log("succes?",success);
+  // console.log("succes?",success);
   return success
   }
   return false;

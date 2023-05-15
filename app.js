@@ -3,7 +3,6 @@ const fs = require("fs/promises");
 const url = require("url");
 const post = require("./post.js");
 const { v4: uuidv4 } = require("uuid");
-const utils = require("./functions/gameLogic.js");
 const functions=require("./functions/utils.js")
 const api=require('./functions/API.js')
 
@@ -113,12 +112,18 @@ wss.on("connection", (ws,req) => {
         let totms=functions.getTotems()
         var rst
         if(players[socketsClients.get(ws)].hits>=5){
+          let endTime=Date.now();
+          let totalTime=endTime-players[socketsClients.get(ws)].start
+
           rst = {
             type: "totems",
             message: totms,
             winner:socketsClients.get(ws),
+            hits:players[socketsClients.get(ws)].hits,
+            errors:players[socketsClients.get(ws)].error,
             player:players[socketsClients.get(ws)]
           };
+
         }else{
 
           rst = {
@@ -151,30 +156,13 @@ wss.on("connection", (ws,req) => {
         functions.setPosition(socketsClients.get(ws),messageAsObject.x,messageAsObject.y)
       }
     } else if (messageAsObject.type == "disconnectPlayer") {
-      // utils.reset()
-      // socketsClients.delete("pl1")
-      // socketsClients.delete("pl2")
+      
       broadcast({ type: "disconnect" })
     }
 
     console.log(messageAsObject)
   });
 });
-
-// Send clientsIds to everyone
-// function sendClients () {
-//   var clients = []
-//   socketsClients.forEach((value, key) => {
-//     clients.push(value.id)
-//   })
-//   wss.clients.forEach((client) => {
-//     if (client.readyState === WebSocket.OPEN) {
-//       var id = socketsClients.get(client).id
-//       var messageAsString = JSON.stringify({ type: "clients", id: id, list: clients })
-//       client.send(messageAsString)
-//     }
-//   })
-// }
 
 // Send position of all players every 200 ms
 const intervalo=setInterval(function() {
@@ -216,50 +204,50 @@ async function private(obj) {
   });
 }
 
-const TARGET_FPS = 60;
-const TARGET_MS = 1000 / TARGET_FPS;
-let frameCount = 0;
-let fpsStartTime = Date.now();
-let currentFPS = 0;
+// const TARGET_FPS = 60;
+// const TARGET_MS = 1000 / TARGET_FPS;
+// let frameCount = 0;
+// let fpsStartTime = Date.now();
+// let currentFPS = 0;
 
-function gameLoop() {
-  const startTime = Date.now();
+// function gameLoop() {
+//   const startTime = Date.now();
 
-  if (currentFPS >= 1) {
-    // Podeu treure la següent línia per millorar el rendiment
-    //  console.log(`FPS actual: ${currentFPS.toFixed(2)}`);
-    // Cridar aquí la funció que actualitza el joc (segons currentFPS)
-    // Cridar aquí la funció que fa un broadcast amb les dades del joc a tots els clients
-    if (socketsClients.has("pl1")) {
-      if (socketsClients.has("pl2")) {
-        // if the players are online the game starts
-        // TODO HERE LOGIC
-        // utils.run(currentFPS.toFixed(2));
-        // broadcast(utils.getRst());
-        // TODO broadcaste neccesary info for the game
-      }
-    }
-  }
-  // if the players are online the game starts
-  // TODO broadcaste neccesary info for the game
+//   if (currentFPS >= 1) {
+//     // Podeu treure la següent línia per millorar el rendiment
+//     //  console.log(`FPS actual: ${currentFPS.toFixed(2)}`);
+//     // Cridar aquí la funció que actualitza el joc (segons currentFPS)
+//     // Cridar aquí la funció que fa un broadcast amb les dades del joc a tots els clients
+//     // if (socketsClients.has("pl1")) {
+//     //   if (socketsClients.has("pl2")) {
+//         // if the players are online the game starts
+//         // TODO HERE LOGIC
+//         // utils.run(currentFPS.toFixed(2));
+//         // broadcast(utils.getRst());
+//         // TODO broadcaste neccesary info for the game
+//       }
+//     }
+//   }
+//   // if the players are online the game starts
+//   // TODO broadcaste neccesary info for the game
 
-  const endTime = Date.now();
-  const elapsedTime = endTime - startTime; // TODO pass this to calculate score
-  const remainingTime = Math.max(1, TARGET_MS - elapsedTime);
+//   // const endTime = Date.now();
+//   // const elapsedTime = endTime - startTime; // TODO pass this to calculate score
+//   // const remainingTime = Math.max(1, TARGET_MS - elapsedTime);
 
-  frameCount++;
-  const fpsElapsedTime = endTime - fpsStartTime;
-  if (fpsElapsedTime >= 500) {
-    currentFPS = (frameCount / fpsElapsedTime) * 1000;
-    frameCount = 0;
-    fpsStartTime = endTime;
-  }
-  if (socketsClients.has("pl1") && socketsClients.has("pl2")) {
-    setTimeout(() => {
-      setImmediate(gameLoop);
-    }, remainingTime);
-  }
-}
+//   // frameCount++;
+//   // const fpsElapsedTime = endTime - fpsStartTime;
+//   // if (fpsElapsedTime >= 500) {
+//   //   currentFPS = (frameCount / fpsElapsedTime) * 1000;
+//   //   frameCount = 0;
+//   //   fpsStartTime = endTime;
+//   // }
+//   // if (socketsClients.has("pl1") && socketsClients.has("pl2")) {
+//   //   setTimeout(() => {
+//   //     setImmediate(gameLoop);
+//   //   }, remainingTime);
+//   // }
+// }
 
 function notFound(req,res){
   res.send({status: "OK", result: `PAGE NOT FOUND`})
