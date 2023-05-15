@@ -161,6 +161,7 @@ function registerObject() {
   y-=360
   x-=644
   // Return the object's position
+  console.log(x,y);
   return { x, y };
 }
 
