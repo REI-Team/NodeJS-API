@@ -5,6 +5,7 @@ const post = require("./post.js");
 const { v4: uuidv4 } = require("uuid");
 const functions=require("./functions/utils.js")
 const api=require('./functions/API.js')
+var isPaused = false;
 
 // Wait 'ms' milliseconds
 function wait(ms) {
@@ -106,6 +107,7 @@ wss.on("connection", (ws,req) => {
 
     }else if (messageAsObject.type == "removeTotem") { 
       if(messageAsObject.id && messageAsObject.totemId){
+        isPaused=true
         let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId,players[socketsClients.get(ws)].degree,socketsClients.get(ws));
         if(correct){
           players[socketsClients.get(ws)].hits++
@@ -145,6 +147,7 @@ wss.on("connection", (ws,req) => {
           errors:players[socketsClients.get(ws)].error
         }
         ws.send(JSON.stringify(rst))
+        isPaused=false
       }
 
     } else if (messageAsObject.type == "broadcast") { // CAN BE USEFULL TO BROADCAST WHEN A PLAYER CONNECT OR WINS
@@ -178,7 +181,7 @@ wss.on("connection", (ws,req) => {
 
 // Send position of all players every 200 ms
 const intervalo=setInterval(function() {
-  if(wss.clients.size>1){
+  if(wss.clients.size>1 && !isPaused){
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         var rst = {
