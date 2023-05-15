@@ -206,7 +206,9 @@ function removeTotem(playerId,totemId,degree,player){
       }
     });
     if(same){
+      console.log("removing",tokens[playerId].totems);
       tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id !== totemId)
+      console.log("removed",tokens[playerId].totems);
     }
     same=false;
     tokens[playerId].traps.forEach(element => {
@@ -221,7 +223,9 @@ function removeTotem(playerId,totemId,degree,player){
         }
       }
       if(same){
+        console.log("removing",tokens[playerId].traps);
         tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
+        console.log("removed",tokens[playerId].traps);
       }
     // console.log(tokens[playerId].totems);
   });
