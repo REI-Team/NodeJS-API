@@ -173,7 +173,7 @@ function checkOverlap(x, y) {
   // Check if the new object overlaps with any previously registered objects
   for (let i = Math.floor(x / cellWidth); i <= Math.ceil((x + cellWidth) / cellWidth) - 1; i++) {
     for (let j = Math.floor(y / cellHeight); j <= Math.ceil((y + cellHeight) / cellHeight) - 1; j++) {
-      if (grid[i][j]) {
+      if (grid[parseInt(i)][parseInt(j)]) {
         return true;
       }
     }
