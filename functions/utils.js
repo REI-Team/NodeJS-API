@@ -199,7 +199,8 @@ function removeTotem(playerId,totemId,degree,player){
           if(playerId!=player){
             // element.position=registerObject()
             console.log("moving:",element.position);
-            tokens[playerId].totem[element].position=registerObject()
+            console.log(tokens[playerId].totem[element]);
+            // tokens[playerId].totem[element].position=registerObject()
             console.log("moved:",tokens[playerId].totem[element].position);
           }else{
             same=true
@@ -218,7 +219,8 @@ function removeTotem(playerId,totemId,degree,player){
       if(element.totem.id==totemId){
           if(playerId!=player){
             console.log("moving:",element.position);
-            tokens[playerId].traps[element].position=registerObject()
+            console.log(tokens[playerId].traps[element]);
+            // tokens[playerId].traps[element].position=registerObject()
             console.log("moved:",tokens[playerId].traps[element].position);
           }else{
             same=true
@@ -250,7 +252,9 @@ async function getDegree(degreeName){
 
 function getPlayerPos(excluded){
   let result=positions
+  console.log(result);
   delete result[excluded]
+  console.log(result);
   return result
 }
 
