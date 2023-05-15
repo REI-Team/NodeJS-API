@@ -167,12 +167,16 @@ wss.on("connection", (ws,req) => {
 // Send position of all players every 200 ms
 const intervalo=setInterval(function() {
   if(wss.clients.size>1){
-    let msg=functions.getPlayerPos(socketsClients.get(client))
-    var rst = {
-      type: "positions",
-      message: msg
-    };
-    broadcast(rst)
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        var rst = {
+          type: "positions",
+          message: functions.getPlayerPos(socketsClients.get(client))
+        };
+        client.send(JSON.stringify(rst))
+      }
+    });
+
   }
 }, 200);
 
