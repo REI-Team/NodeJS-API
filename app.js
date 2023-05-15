@@ -172,7 +172,7 @@ wss.on("connection", (ws,req) => {
       broadcast({ type: "disconnect" })
     }
 
-    console.log(messageAsObject)
+    // console.log(messageAsObject)
   });
 });
 
