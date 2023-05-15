@@ -190,7 +190,7 @@ const intervalo=setInterval(function() {
     });
 
   }
-}, 200);
+}, 700);
 
 // Send a message to all websocket clients
 async function broadcast(obj) {
