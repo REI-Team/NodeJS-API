@@ -169,9 +169,10 @@ const intervalo=setInterval(function() {
   if(wss.clients.size>1){
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
+        let msg=functions.getPlayerPos(socketsClients.get(client))
         var rst = {
           type: "positions",
-          message: functions.getPlayerPos(socketsClients.get(client))
+          message: msg
         };
         client.send(rst)
       }
