@@ -260,7 +260,7 @@ async function getDegree(degreeName){
 }
 
 function getPlayerPos(excluded){
-  let result=JSON.parse(JSON.stringify(positions))
+  let result=JSON.parse(positions.toString())
   // console.log(result);
   delete result[excluded]
   // console.log(result);
