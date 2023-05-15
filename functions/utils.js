@@ -182,9 +182,10 @@ function checkOverlap(x, y) {
 }
 
 // Totem remove function
-function removeTotem(playerId,totemId,degree){
+function removeTotem(playerId,totemId,degree,player){
   console.log(playerId,totemId,degree);
   let success=false;
+  let same=false
   if(tokens[playerId]){
     // console.log("pre totems",tokens);
     
@@ -195,18 +196,33 @@ function removeTotem(playerId,totemId,degree){
         if(element.totem.degree==degree.toString()){
           // console.log("found",element);
           // console.log("-------------------------")
+          if(playerId!=player){
+            element.position=registerObject()
+          }else{
+            same=true
+          }
           success=true
         }
       }
     });
-    tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id !== totemId)
+    if(same){
+      tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id !== totemId)
+    }
+    same=false;
     tokens[playerId].traps.forEach(element => {
       if(element.totem.id==totemId){
         if(element.totem.degree==degree.toString()){
+          if(playerId!=player){
+            element.position=registerObject()
+          }else{
+            same=true
+          }
           success=false
         }
       }
-    tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
+      if(same){
+        tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id !== totemId)
+      }
     // console.log(tokens[playerId].totems);
   });
   // console.log("succes?",success);

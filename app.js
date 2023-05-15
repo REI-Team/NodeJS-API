@@ -106,11 +106,13 @@ wss.on("connection", (ws,req) => {
 
     }else if (messageAsObject.type == "removeTotem") { 
       if(messageAsObject.id && messageAsObject.totemId){
-        let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId,players[socketsClients.get(ws)].degree);
+        let correct=functions.removeTotem(messageAsObject.id,messageAsObject.totemId,players[socketsClients.get(ws)].degree,socketsClients.get(ws));
         if(correct){
           players[socketsClients.get(ws)].hits++
+          console.log("totem ok");
         }else{
           players[socketsClients.get(ws)].error++
+          console.log("Totem wrong");
         }
         let totms=functions.getTotems()
         var rst
@@ -124,7 +126,8 @@ wss.on("connection", (ws,req) => {
             winner:socketsClients.get(ws),
             hits:players[socketsClients.get(ws)].hits,
             errors:players[socketsClients.get(ws)].error,
-            player:players[socketsClients.get(ws)]
+            player:players[socketsClients.get(ws)],
+            endTime:totalTime
           };
 
         }else{
