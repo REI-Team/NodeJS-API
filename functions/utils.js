@@ -216,7 +216,6 @@ function removeTotem(playerId,totemId,degree,player){
     same=false;
     tokens[playerId].traps.forEach(element => {
       if(element.totem.id==totemId){
-        if(element.totem.degree.toString()==degree.toString()){
           if(playerId!=player){
             console.log("moving:",element.position);
             tokens[playerId].traps[element].position=registerObject()
@@ -225,7 +224,6 @@ function removeTotem(playerId,totemId,degree,player){
             same=true
           }
           success=false
-        }
       }
       if(same){
         console.log("removing",tokens[playerId].traps);
