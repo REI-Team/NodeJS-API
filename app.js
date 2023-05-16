@@ -72,6 +72,11 @@ wss.on("connection", (ws,req) => {
       console.log(functions.getTotems());
       console.log(players);
       console.log(socketsClients);
+      let y=Math.floor(1416 / 60)
+      let x=Math.floor(2516 / 50)
+      functions.grid = new Array(x)
+        .fill()
+        .map(() => new Array(y).fill(false));
       // TODO stop logic here
     }
   });
