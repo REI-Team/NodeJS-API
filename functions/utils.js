@@ -136,7 +136,7 @@ let y=Math.floor(1416 / 60)
 // y-=360
 let x=Math.floor(2516 / 50)
 // x-=644
-const grid = new Array(x)
+var grid = new Array(x)
   .fill()
   .map(() => new Array(y).fill(false));
 
@@ -197,21 +197,18 @@ function removeTotem(playerId,totemId,degree,player){
     let tempTotems=[]
     
     tokens[playerId].totems.forEach(element => {
-      // console.log(element);
-      // console.log(element.totem,totemId);
       if(element.totem.id==totemId){
+        try {
+          grid[element.position.x][element.position.y]=false // this to clean the entry of the array
+        } catch (error) {
+          
+        }
+        if(playerId!=player){
+          element.position=registerObject()
+        }else{
+          same=true
+        }
         if(element.totem.degree.toString()==degree.toString()){
-          // console.log("found",element);
-          // console.log("-------------------------")
-          if(playerId!=player){
-            // element.position=registerObject()
-            console.log("moving:",element.position);
-            // console.log(tokens[playerId].totems[element]);
-            element.position=registerObject()
-            console.log("moved:",);
-          }else{
-            same=true
-          }
           success=true
         }
       }
@@ -227,6 +224,11 @@ function removeTotem(playerId,totemId,degree,player){
     tempTotems=[]
     tokens[playerId].traps.forEach(element => {
       if(element.totem.id==totemId){
+        try {
+          grid[element.position.x][element.position.y]=false
+        } catch (error) {
+          
+        }
           if(playerId!=player){
             element.position=registerObject()
           }else{
@@ -277,4 +279,4 @@ function delPosition(player){
   delete positions[player]
 }
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,delPosition,setPosition,getTotems,getDegree,getPlayerPos,tokens,positions }
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,delPosition,setPosition,getTotems,getDegree,getPlayerPos,grid,tokens,positions }
