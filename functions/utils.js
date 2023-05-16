@@ -189,7 +189,7 @@ function checkOverlap(x, y) {
 
 // Totem remove function
 function removeTotem(playerId,totemId,degree,player){
-  console.log(playerId,totemId,degree);
+  // console.log(playerId,totemId,degree);
   let success=false;
   let same=false
   if(tokens[playerId]){
@@ -216,9 +216,9 @@ function removeTotem(playerId,totemId,degree,player){
     });
     tokens[playerId].totems=tempTotems
     if(same){
-      console.log("removing",tokens[playerId].totems);
+      // console.log("removing",tokens[playerId].totems);
       tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id.toString() !== totemId.toString())
-      console.log("removed",tokens[playerId].totems);
+      // console.log("removed",tokens[playerId].totems);
     }
     same=false;
     tempTotems=[]
@@ -243,9 +243,9 @@ function removeTotem(playerId,totemId,degree,player){
     tokens[playerId].traps=tempTotems
     // console.log("succes?",success);
     if(same){
-      console.log("removing",tokens[playerId].traps);
+      // console.log("removing",tokens[playerId].traps);
       tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id.toString() !== totemId.toString())
-      console.log("removed",tokens[playerId].traps);
+      // console.log("removed",tokens[playerId].traps);
     }
   return success
   }
@@ -258,7 +258,7 @@ function getTotems(){
 
 async function getDegree(degreeName){
   let result=await queryDatabase(`SELECT id FROM degree WHERE name='${degreeName}';`)
-  console.log(result[0].id);
+  // console.log(result[0].id);
   return result[0].id;
 }
 
