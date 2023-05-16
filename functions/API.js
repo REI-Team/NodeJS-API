@@ -7,7 +7,7 @@ router.post('/set_record',setRecord)
 router.post('/get_ranking',getRanking)
 router.post('/get_ranking_desk',getRankingDesktop)
 router.post('/set_visibility',setVisibility)
-router.get('/test',functions.makeTokens)
+// router.get('/test',functions.makeTokens)
 
 
 async function setRecord(req,res){
