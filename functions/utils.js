@@ -3,7 +3,7 @@ const mysql=require('mysql2')
 var express = require('express');
 var bcrypt = require("bcryptjs");
 
-var positions=[]
+var positions={}
 var tokens={} // variable for broadcast totems to all clients
 
 // Perform a query to the database
@@ -87,7 +87,7 @@ async function storeConn(ip,type){
   }
 }
 
-async function makeTokens(id,name,degree){ 
+async function makeTokens(id,degree){ 
   let ocupations=await queryDatabase(`SELECT * FROM ocupations WHERE degree=${degree};`)
   if(ocupations.length>4){
     let choosed=[]
@@ -96,9 +96,10 @@ async function makeTokens(id,name,degree){
     for (let index = 0; index < 5; index++) {
 
       while (actualnum==0||choosed.includes(actualnum)) {
-        actualnum=getRandomInt(ocupations.length)
+        actualnum=getRandomInt(ocupations.length-1)
       }
       choosed.push(actualnum)
+      // console.log("pushing",ocupations[actualnum],actualnum);
       tokensArray.push({totem:ocupations[actualnum],position:registerObject()})
     }
 
@@ -116,7 +117,7 @@ async function makeTokens(id,name,degree){
         trapsArray.push({totem:traps[actualnum],position:registerObject()})
       }
       tokens[id]={totems:tokensArray,traps:trapsArray}
-      console.log("ACTUAL TOKENS:",tokens);
+      // console.log("ACTUAL TOKENS:",tokens[id].totems);
       // wait(1000);
       return tokens
   }
@@ -131,8 +132,10 @@ function getRandomInt(max) {
 
 // Generate totems position
 // Initialize an empty grid to keep track of registered object positions
-let y=Math.floor(1440 / 60)
-let x=Math.floor(2560 / 50)
+let y=Math.floor(1416 / 60)
+// y-=360
+let x=Math.floor(2516 / 50)
+// x-=644
 const grid = new Array(x)
   .fill()
   .map(() => new Array(y).fill(false));
@@ -140,14 +143,15 @@ const grid = new Array(x)
 function registerObject() {
   const cellWidth = 50;
   const cellHeight = 60;
-  const mapWidth = 2560;
-  const mapHeight = 1440;
+  const mapWidth = 2516;
+  const mapHeight = 1416;
 
   // Generate a random x and y position for the new object
   let x, y;
   do {
     x = Math.floor(Math.random() * (mapWidth - cellWidth));
     y = Math.floor(Math.random() * (mapHeight - cellHeight));
+    
   } while (checkOverlap(x, y));
 
   // Register the object's position on the grid
@@ -155,7 +159,10 @@ function registerObject() {
   const gridY = Math.floor(y / cellHeight);
   grid[gridX][gridY] = true;
 
+  y-=360
+  x-=644
   // Return the object's position
+  // console.log(x,y);
   return { x, y };
 }
 
@@ -167,13 +174,107 @@ function checkOverlap(x, y) {
   // Check if the new object overlaps with any previously registered objects
   for (let i = Math.floor(x / cellWidth); i <= Math.ceil((x + cellWidth) / cellWidth) - 1; i++) {
     for (let j = Math.floor(y / cellHeight); j <= Math.ceil((y + cellHeight) / cellHeight) - 1; j++) {
-      if (grid[i][j]) {
-        return true;
+      try {
+        
+        if (grid[parseInt(i)][parseInt(j)]) {
+          return true;
+        }
+      } catch (error) {
+        console.log("error",i,j);
       }
     }
   }
   return false;
 }
 
+// Totem remove function
+function removeTotem(playerId,totemId,degree,player){
+  console.log(playerId,totemId,degree);
+  let success=false;
+  let same=false
+  if(tokens[playerId]){
+    // console.log("pre totems",tokens);
+    let tempTotems=[]
+    
+    tokens[playerId].totems.forEach(element => {
+      // console.log(element);
+      // console.log(element.totem,totemId);
+      if(element.totem.id==totemId){
+        if(element.totem.degree.toString()==degree.toString()){
+          // console.log("found",element);
+          // console.log("-------------------------")
+          if(playerId!=player){
+            // element.position=registerObject()
+            console.log("moving:",element.position);
+            // console.log(tokens[playerId].totems[element]);
+            element.position=registerObject()
+            console.log("moved:",);
+          }else{
+            same=true
+          }
+          success=true
+        }
+      }
+      tempTotems.push(element)
+    });
+    tokens[playerId].totems=tempTotems
+    if(same){
+      console.log("removing",tokens[playerId].totems);
+      tokens[playerId].totems=tokens[playerId].totems.filter(item => item.totem.id.toString() !== totemId.toString())
+      console.log("removed",tokens[playerId].totems);
+    }
+    same=false;
+    tempTotems=[]
+    tokens[playerId].traps.forEach(element => {
+      if(element.totem.id==totemId){
+          if(playerId!=player){
+            element.position=registerObject()
+          }else{
+            same=true
+          }
+          success=false
 
-module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,tokens }
+      }
+      // console.log(tokens[playerId].totems);
+      tempTotems.push(element)
+    });
+    tokens[playerId].traps=tempTotems
+    // console.log("succes?",success);
+    if(same){
+      console.log("removing",tokens[playerId].traps);
+      tokens[playerId].traps=tokens[playerId].traps.filter(item => item.totem.id.toString() !== totemId.toString())
+      console.log("removed",tokens[playerId].traps);
+    }
+  return success
+  }
+  return false;
+}
+
+function getTotems(){
+  return tokens
+}
+
+async function getDegree(degreeName){
+  let result=await queryDatabase(`SELECT id FROM degree WHERE name='${degreeName}';`)
+  console.log(result[0].id);
+  return result[0].id;
+}
+
+function getPlayerPos(){
+  return positions
+}
+
+function setPosition(player,x,y){
+  if(positions[player]){
+    positions[player].x=x
+    positions[player].y=y
+  }else{
+    positions[player]={x:x,y:y}
+  }
+}
+
+function delPosition(player){
+  delete positions[player]
+}
+
+module.exports = { queryDatabase,wait,toLocalTime,encriptPassword,saveScore,storeConn,makeTokens,removeTotem,delPosition,setPosition,getTotems,getDegree,getPlayerPos,tokens,positions }
