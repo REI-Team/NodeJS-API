@@ -259,11 +259,7 @@ async function getDegree(degreeName){
   return result[0].id;
 }
 
-function getPlayerPos(excluded){
-  // let result=Object.assign({}, positions);
-  // // console.log(result);
-  // delete result[excluded]
-  // console.log(result);
+function getPlayerPos(){
   return positions
 }
 

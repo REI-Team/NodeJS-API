@@ -56,10 +56,6 @@ wss.on("connection", (ws,req) => {
   var rst = { type: "connectionTest", message: "OK" ,player:id};
   ws.send(JSON.stringify(rst));
 
-  // gameLoop();
-  // Send clients list to everyone
-  // sendClients()
-
   // What to do when a client is disconnected
   ws.on("close", () => {
     // TODO here change to control tokens 
@@ -89,6 +85,7 @@ wss.on("connection", (ws,req) => {
       console.log("Could not parse bufferedMessage from WS message");
     }
     if (messageAsObject.type == "setPlayer" && messageAsObject.grade && messageAsObject.username) {
+      isPaused=true
       let degre=await functions.getDegree(messageAsObject.grade)
       let ok=await functions.makeTokens(socketsClients.get(ws) , degre)
       // console.log(ok);
@@ -103,7 +100,8 @@ wss.on("connection", (ws,req) => {
         var rst = { type: "error", message: "Token generate error" };
           ws.send(JSON.stringify(rst));
       }
-
+      await functions.wait(700)
+      isPaused=false
 
     }else if (messageAsObject.type == "removeTotem") { 
       if(messageAsObject.id && messageAsObject.totemId){
@@ -147,6 +145,7 @@ wss.on("connection", (ws,req) => {
           errors:players[socketsClients.get(ws)].error
         }
         ws.send(JSON.stringify(rst))
+        await functions.wait(700)
         isPaused=false
       }
 
@@ -186,14 +185,14 @@ const intervalo=setInterval(function() {
       if (client.readyState === WebSocket.OPEN) {
         var rst = {
           type: "positions",
-          message: functions.getPlayerPos(socketsClients.get(client))
+          message: functions.getPlayerPos()
         };
         client.send(JSON.stringify(rst))
       }
     });
 
   }
-}, 700);
+}, 200);
 
 // Send a message to all websocket clients
 async function broadcast(obj) {
@@ -218,51 +217,6 @@ async function private(obj) {
     }
   });
 }
-
-// const TARGET_FPS = 60;
-// const TARGET_MS = 1000 / TARGET_FPS;
-// let frameCount = 0;
-// let fpsStartTime = Date.now();
-// let currentFPS = 0;
-
-// function gameLoop() {
-//   const startTime = Date.now();
-
-//   if (currentFPS >= 1) {
-//     // Podeu treure la següent línia per millorar el rendiment
-//     //  console.log(`FPS actual: ${currentFPS.toFixed(2)}`);
-//     // Cridar aquí la funció que actualitza el joc (segons currentFPS)
-//     // Cridar aquí la funció que fa un broadcast amb les dades del joc a tots els clients
-//     // if (socketsClients.has("pl1")) {
-//     //   if (socketsClients.has("pl2")) {
-//         // if the players are online the game starts
-//         // TODO HERE LOGIC
-//         // utils.run(currentFPS.toFixed(2));
-//         // broadcast(utils.getRst());
-//         // TODO broadcaste neccesary info for the game
-//       }
-//     }
-//   }
-//   // if the players are online the game starts
-//   // TODO broadcaste neccesary info for the game
-
-//   // const endTime = Date.now();
-//   // const elapsedTime = endTime - startTime; // TODO pass this to calculate score
-//   // const remainingTime = Math.max(1, TARGET_MS - elapsedTime);
-
-//   // frameCount++;
-//   // const fpsElapsedTime = endTime - fpsStartTime;
-//   // if (fpsElapsedTime >= 500) {
-//   //   currentFPS = (frameCount / fpsElapsedTime) * 1000;
-//   //   frameCount = 0;
-//   //   fpsStartTime = endTime;
-//   // }
-//   // if (socketsClients.has("pl1") && socketsClients.has("pl2")) {
-//   //   setTimeout(() => {
-//   //     setImmediate(gameLoop);
-//   //   }, remainingTime);
-//   // }
-// }
 
 function notFound(req,res){
   res.send({status: "OK", result: `PAGE NOT FOUND`})
