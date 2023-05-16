@@ -54,6 +54,7 @@ wss.on("connection", (ws,req) => {
   players[id]={start:0,end:0,hits:0,error:0,username:"",degree:0}
   socketsClients.set(ws,id);
   var rst = { type: "connectionTest", message: "OK" ,player:id};
+
   ws.send(JSON.stringify(rst));
 
   // What to do when a client is disconnected
@@ -174,7 +175,6 @@ wss.on("connection", (ws,req) => {
       broadcast({ type: "disconnect" })
     }
 
-    // console.log(messageAsObject)
   });
 });
 
